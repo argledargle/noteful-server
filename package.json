@@ -10,8 +10,22 @@
   "author": "Thomas `tomatao` Hudspith-Tatham <iammotivated@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "chai": "^4.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
     "faker": "^4.1.0",
+    "helmet": "^3.20.0",
     "json-server": "^0.14.0",
-    "mem": "^5.1.1"
+    "knex": "^0.19.1",
+    "mem": "^5.1.1",
+    "mocha": "^6.2.0",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.19.1",
+    "pg": "^7.12.0",
+    "postgrator": "^3.10.2",
+    "postgrator-cli": "^3.1.0",
+    "supertest": "^4.0.2",
+    "xss": "^1.0.6"
   }
 }
