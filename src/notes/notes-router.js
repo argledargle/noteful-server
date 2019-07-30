@@ -2,15 +2,22 @@ const path = require("path");
 const express = require("express");
 const xss = require("xss");
 const NotesService = require("./notes-service");
-const uuid = require("uuid")
+const uuid = require("uuid");
 
 const notesRouter = express.Router();
 const jsonParser = express.json();
 
+const serializeNewNote = note => ({
+  id: uuid(),
+  folderId: xss(note.folderId),
+  modified: xss(Date.now()),
+  content: xss(note.content)
+});
+
 const serializeNote = note => ({
   id: uuid(),
   folderId: xss(note.folderId),
-  modified: now(),
+  modified: xss(note.modified),
   content: xss(note.content)
 });
 
@@ -38,11 +45,30 @@ notesRouter
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `/${folderId}/${note.id}`))
-          .json(serializeNote);
+          .json(serializeNewNote(note));
       })
       .catch(next);
   });
 
-  //RESUME ROUTER FROM HERE
+notesRouter
+  .route("/notes/:note_id")
+  .all((req, res, next) => {
+    NotesService.getById(req.app.get("db"), req.params.id)
+      .then(note => {
+        if (!note) {
+          return res.status(404).json({
+            error: { message: `Note doesn't exist` }
+          });
+        }
+        res.note = note;
+        next();
+      })
+      .catch(next);
+  })
+  .get((eq, res, next) => {
+    res.json(serializeNote(res.note));
+  });
 
-  module.exports = notesRouter;
+//RESUME ROUTER FROM HERE
+
+module.exports = notesRouter;
