@@ -2,9 +2,9 @@ const FolderService = {
     getAllFolders(knex) {
         return knex.select('*').from('noteful_folders')
     },
-    insertFolder(knex, newNote) {
+    insertFolder(knex, newFolder) {
         return knex
-        .insert(newNote).into('noteful_folders')
+        .insert(newFolder).into('noteful_folders')
         .returning('*')
         .then(rows => {
             return rows[0]
@@ -13,15 +13,18 @@ const FolderService = {
     getById(knex, id) {
         return knex.from('noteful_folders').select('*').where('id', id).first()       
     },
+    getByFolderId(knex, folderid) {
+        return knex.from('noteful_notes').select('*').where('folderid', folderid)
+    },
     deleteFolder(knex, id) {
         return knex('noteful_folders')
         .where({ id })
         .delete()
     },
-    updateFolder(knex, id, newNoteFields) {
+    updateFolder(knex, id, newFolderFields) {
         return knex('noteful_folders')
           .where({ id })
-          .update(newNoteFields)
+          .update(newFolderFields)
       },
 }
 

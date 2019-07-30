@@ -53,6 +53,23 @@ notesRouter
       .catch(next);
   });
 
+//this where we try to get all notes from a folder by folderid
+notesRouter.route("/content/:folderid").get((req, res, next) => {
+  NotesService.getByFolderId(req.app.get("db"), req.params.folderid)
+   .then(folder => {
+      if (!folder) {
+        return res.status(404).json({
+          error: { message: `Folder doesn't exist` }
+        });
+      }
+      res.note = note;
+      next();
+    })
+    .catch(next);
+}).get((req, res, next)=> {
+    res.json(note.map(serializeNote))
+})
+
 notesRouter
   .route("/:note_id")
   .all((req, res, next) => {
@@ -68,7 +85,7 @@ notesRouter
       })
       .catch(next);
   })
-  .get((eq, res, next) => {
+  .get((req, res, next) => {
     res.json(serializeNote(res.note));
   })
   .delete((req, res, next) => {
