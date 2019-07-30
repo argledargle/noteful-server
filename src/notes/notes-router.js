@@ -10,14 +10,16 @@ const serializeNewNote = note => ({
   id: note.id,
   folderid: xss(note.folderid),
   modified: xss(Date.now()),
-  content: xss(note.content)
+  content: xss(note.content),
+  name: xss(note.name)
 });
 
 const serializeNote = note => ({
   id: note.id,
   folderid: xss(note.folderid),
   modified: xss(note.modified),
-  content: xss(note.content)
+  content: xss(note.content),
+  name: xss(note.name)
 });
 
 notesRouter
@@ -70,12 +72,30 @@ notesRouter
     res.json(serializeNote(res.note));
   })
   .delete((req, res, next) => {
-      NotesService.deleteNote(req.app.get("db"), req.params.note_id)
+    NotesService.deleteNote(req.app.get("db"), req.params.note_id)
       .then(numRowsAffects => {
-          res.status(204).end();
+        res.status(204).end();
       })
       .catch(next);
   })
+  .patch(jsonParser, (req, res, next) => {
+    const { name, content } = req.body;
+    const noteToUpdate = { name, content };
+
+    const numberofValues = Object.values(noteToUpdate).filter(Boolean).length;
+    if (numberofValues === 0)
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain either 'name' or 'content'`
+        }
+      });
+
+    NotesService.updateNote(req.app.get("db"), req.params.note_id, noteToUpdate)
+      .then(numRowsAffected => {
+        res.status(204).end();
+      })
+      .catch(next);
+  });
 
 //RESUME ROUTER FROM HERE
 
