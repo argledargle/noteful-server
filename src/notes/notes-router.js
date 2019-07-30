@@ -97,6 +97,4 @@ notesRouter
       .catch(next);
   });
 
-//RESUME ROUTER FROM HERE
-
 module.exports = notesRouter;
