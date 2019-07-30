@@ -22,11 +22,6 @@ app.use("/api/folders", foldersRouter);
 app.get("/", (req, res) => {
   res.send("Hello, world!");
 });
-//still need to install xss functionality
-//app.get("/xss", (req, res) => {
-//  res.cookie("secretToken", "1234567890");
-//  res.sendFile(__dirname + "/xss-example.html");
-//});
 
 app.use(function errorHandler(error, req, res, next) {
   let response;
