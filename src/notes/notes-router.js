@@ -2,21 +2,20 @@ const path = require("path");
 const express = require("express");
 const xss = require("xss");
 const NotesService = require("./notes-service");
-const uuid = require("uuid");
 
 const notesRouter = express.Router();
 const jsonParser = express.json();
 
 const serializeNewNote = note => ({
-  id: uuid(),
-  folderId: xss(note.folderId),
+  id: note.id,
+  folderid: xss(note.folderid),
   modified: xss(Date.now()),
   content: xss(note.content)
 });
 
 const serializeNote = note => ({
-  id: uuid(),
-  folderId: xss(note.folderId),
+  id: note.id,
+  folderid: xss(note.folderid),
   modified: xss(note.modified),
   content: xss(note.content)
 });
@@ -32,8 +31,8 @@ notesRouter
       .catch(next);
   })
   .post(jsonParser, (req, res, next) => {
-    const { name, content, folderId } = req.body;
-    const newNote = { name, content, folderId };
+    const { name, content, folderid } = req.body;
+    const newNote = { name, content, folderid };
 
     for (const [key, value] of Object.entries(newNote))
       if (value == null)
@@ -44,16 +43,18 @@ notesRouter
       .then(note => {
         res
           .status(201)
-          .location(path.posix.join(req.originalUrl, `/${folderId}/${note.id}`))
+          .location(
+            path.posix.join(req.originalUrl, `/${note.folderid}/${note.id}`)
+          )
           .json(serializeNewNote(note));
       })
       .catch(next);
   });
 
 notesRouter
-  .route("/notes/:note_id")
+  .route("/:note_id")
   .all((req, res, next) => {
-    NotesService.getById(req.app.get("db"), req.params.id)
+    NotesService.getById(req.app.get("db"), req.params.note_id)
       .then(note => {
         if (!note) {
           return res.status(404).json({
